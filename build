@@ -1,4 +1,4 @@
-!/usr/bin/env bash
+#!/usr/bin/env bash
 # download + compile WebTemplates
 if cd WebTemplates > /dev/null 2>&1; then git pull; else {
     git clone 'https://github.com/CoconutMacaroon/WebTemplates' && cd WebTemplates;
