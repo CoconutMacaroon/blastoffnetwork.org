@@ -1,4 +1,10 @@
 !/usr/bin/env bash
+# download + compile WebTemplates
+if cd WebTemplates > /dev/null 2>&1; then git pull; else {
+    git clone 'https://github.com/CoconutMacaroon/WebTemplates' && cd WebTemplates;
+} fi;
+ant jar
+
 # figure out the directory containing the script
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
@@ -29,7 +35,7 @@ cd "$TMP_DIR" || exit
 
 # apply all the templates only to HTML files
 # You can't output to the file you're reading, so we use a temp file instead
-find "$(pwd)" -type f -path '*.html' -exec sh -c 'TMP=$(mktemp) && CURRENT_FILE="{}" && java -jar /www/WebTemplates.jar "$CURRENT_FILE" > $TMP && cp $TMP "$CURRENT_FILE" && rm "$TMP"' \;
+find "$(pwd)" -type f -path '*.html' -exec sh -c 'TMP=$(mktemp) && CURRENT_FILE="{}" && java -jar /www/WebTemplates/build/jar/WebTemplates.jar "$CURRENT_FILE" > $TMP && cp $TMP "$CURRENT_FILE" && rm "$TMP"' \;
 
 # remove the template files, as we don't need them any more
 find . -type f -path '*.template' -delete
