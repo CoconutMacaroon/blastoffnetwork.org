@@ -1,0 +1,44 @@
+!/usr/bin/env bash
+# figure out the directory containing the script
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
+# make a temp directory - if we just used public, the templates would be publicly accessable during generation
+# also, there might be a period in time between when we wiped the public folder and when we were finished generating the[root@debian-s-1vcpu-1gb-sfo3-01 www]# cat build
+#!/usr/bin/env bash
+# figure out the directory containing the script
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
+# make a temp directory - if we just used public, the templates would be publicly accessable during generation
+# also, there might be a period in time between when we wiped the public folder and when we were finished generating the[root@debian-s-1vcpu-1gb-sfo3-01 www]# cat build
+#!/usr/bin/env bash
+# figure out the directory containing the script
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
+# make a temp directory - if we just used public, the templates would be publicly accessable during generation
+# also, there might be a period in time between when we wiped the public folder and when we were finished generating the output
+TMP_DIR=$(mktemp --directory)
+
+# create the public folder if needed
+mkdir -p "${SCRIPT_DIR}"/public
+
+# copy the source files to a temp directory
+cp -r "${SCRIPT_DIR}"/src/* "$TMP_DIR"
+
+# go to the temp directory
+cd "$TMP_DIR" || exit
+
+# apply all the templates only to HTML files
+# You can't output to the file you're reading, so we use a temp file instead
+find "$(pwd)" -type f -path '*.html' -exec sh -c 'TMP=$(mktemp) && CURRENT_FILE="{}" && java -jar /www/WebTemplates.jar "$CURRENT_FILE" > $TMP && cp $TMP "$CURRENT_FILE" && rm "$TMP"' \;
+
+# remove the template files, as we don't need them any more
+find . -type f -path '*.template' -delete
+
+# clear out the old public files - hide errors (i.e., if there were no files there)
+rm -rf "${SCRIPT_DIR}"/public/*
+
+# copy the generated files to the public folder
+cp -r "${TMP_DIR}"/* "${SCRIPT_DIR}"/public
+
+# and remove the temp directory used for generating the output
+rm -rf "$TMP_DIR" 
